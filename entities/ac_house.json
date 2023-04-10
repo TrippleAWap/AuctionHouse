@@ -1,0 +1,40 @@
+{
+    "format_version": "1.16.100",
+    "minecraft:entity": {
+        "description": {
+            "identifier": "tripple:ac_house",
+            "is_summonable": true,
+            "is_spawnable": true
+        },
+        "component_groups": {},
+        "components": {
+            "minecraft:inventory": {
+                "inventory_size": 54,
+                "container_type": "inventory",
+                "can_be_siphoned_from": true
+            },
+            "minecraft:scale": {
+                "value": 1
+            },
+            "minecraft:nameable": {
+                "alwaysShow": false,
+                "allow_name_tag_renaming": false
+            },
+            "minecraft:damage_sensor": {
+                "triggers": {
+                    "deals_damage": false
+                }
+            },
+            "minecraft:physics": {},
+            "minecraft:pushable": {
+                "is_pushable": false,
+                "is_pushable_by_piston": false
+            },
+            "minecraft:collision_box": {
+                "width": 2,
+                "height": 2
+            }
+        },
+        "events": {}
+    }
+}

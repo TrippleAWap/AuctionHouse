@@ -1,0 +1,52 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "[ NEW ] Auction House",
+		"description": "This pack was made by TrippleAWap#2626",
+		"min_engine_version": [
+			1,
+			19,
+			63
+		],
+		"uuid": "b17e4789-1a06-4283-95cb-5bcd67d272ca",
+		"version": [
+			1,
+			0,
+			2
+		]
+	},
+	"modules": [
+		{
+			"description": "make it work on realm",
+			"type": "data",
+			"uuid": "75deb026-f6e4-40b8-b0f6-a55dbb860f0c",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"description": "Gametest Framework Needs To Be Enabled",
+			"language": "javascript",
+			"type": "script",
+			"uuid": "a657103f-c4c8-46e2-a652-56beb15845fa",
+			"version": [
+				1,
+				0,
+				0
+			],
+			"entry": "index.js"
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "1.1.0-beta"
+		},
+		{
+			"module_name": "@minecraft/server-ui",
+			"version": "1.0.0-beta"
+		}
+	]
+}
