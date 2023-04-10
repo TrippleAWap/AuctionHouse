@@ -1,6 +1,6 @@
 import { ActionFormData } from "@minecraft/server-ui";
 import { Database } from "./database";
-import { world, system, ItemStack, Vector } from "@minecraft/server";
+import { world, system, ItemStack } from "@minecraft/server";
 
 const auctions = new Database("auctions")
 if (!auctions.has("auctions")) auctions.set("auctions", [])
@@ -20,18 +20,12 @@ export const auctionHouseDB = new Database("auctionHouse")
 const moneyObj = world.scoreboard.getObjective("money")
 
 system.runInterval(() => {
-    const auctionHouseEntities = world.getDimension(`overworld`).getEntities({ type: "csc:ac_house" });
+    const auctionHouseEntities = world.getDimension(`overworld`).getEntities({ type: "tripple:ac_house" });
     for (const entity of auctionHouseEntities) {
         const inventory = entity.getComponent('inventory').container;
         for (let i = 0; i < inventory.size; i++) {
             const auctionItem = auctionHouseDB.get("AuctionHouse")[i];
-            if (!auctionItem) {
-                const barrier = new ItemStack("minecraft:barrier", 1);
-                barrier.nameTag = `§c `;
-                inventory.setItem(i, barrier);
-                continue;
-            }
-
+            if (!auctionItem) continue;
             const item = new ItemStack(auctionItem.typeId);
             item.nameTag = `§6${capitilizeFirstLetter(auctionItem.typeId.replace("minecraft:", "").replace("_", " "))}`;
             const lore = [
@@ -80,8 +74,9 @@ system.runInterval(() => {
                     if (playerInventory.getSlot(slot).getLore().slice(3).toString() == auctionItem.lore) {
                         const newItem = new ItemStack(auctionItem.typeId, auctionItem.count);
                         newItem.nameTag = auctionItem.name;
-                        newItem.setLore(auctionHouseDB.get("AuctionHouse")[i].lore);
+                        newItem.setLore(auctionItem.lore)
                         playerInventory.setItem(slot, newItem);
+                        break
                     }
                 }
                 player.runCommandAsync(`scoreboard players remove @s ${moneyObj.id} ${auctionItem.price}`);
@@ -111,7 +106,10 @@ system.runInterval(() => {
             ];
             item.setLore(lore);
             item.amount = auctionItem.count;
-            if (inventory.getSlot(i)?.amount < 1 || inventory.getSlot(i)?.typeId == "minecraft:barrier" && item) inventory.setItem(i, item);
+            if (inventory.getSlot(i)?.amount < 1 || inventory.getSlot(i)?.typeId == "minecraft:barrier") {
+                if (item) inventory.setItem(i, item)
+                else if (inventory.getSlot(i)?.typeId != "minecraft:barrier") inventory.setItem(i, new ItemStack("minecraft:barrier", 1))
+            }
         }
     }
 });
@@ -125,7 +123,8 @@ world.events.beforeChat.subscribe(data => {
             if (data.sender.getComponent('inventory').container.getSlot(data.sender.selectedSlot)?.amount < 1) return data.sender.sendMessage(`§cPlease hold an item.`)
             if (!args[2]) return data.sender.sendMessage(`§cPlease specify the cost of the item.`)
             auctionHouseDB.add("AuctionHouse", { seller: data.sender.name, typeId: data.sender.getComponent('inventory').container.getItem(data.sender.selectedSlot).typeId, count: data.sender.getComponent('inventory').container.getItem(data.sender.selectedSlot).amount, lore: data.sender.getComponent('inventory').container.getItem(data.sender.selectedSlot).getLore(), name: data.sender.getComponent('inventory').container.getItem(data.sender.selectedSlot).nameTag, price: Number(args[2]), creationData: Date.now() })
-            data.sender.runCommandAsync(`replaceitem entity @s slot.weapon.mainhand 0 air 63`)
+            data.sender.runCommandAsync(`replaceitem entity @s slot.weapon.mainhand 0 air 1`)
+            data.sender.sendMessage(`§aYou have added the item to the auction house for §e$${args[2]}§a.`)
         }
         if (args[1] === "remove") {
             if (!args[2]) return data.sender.sendMessage(`§cPlease specify the cost of the item.`)
@@ -157,7 +156,7 @@ system.runInterval(() => {
         player.container2 = []
         for (var i = 0; i < inv.size; i++) player.container2.push(inv.getItem(i))
     }
-    world.getDimension(`overworld`).runCommandAsync(`execute as @e[type=csc:ac_house] at @s run kill @e[type=item,r=3]`)
+    world.getDimension(`overworld`).runCommandAsync(`execute as @e[type=tripple:ac_house] at @s run kill @e[type=item,r=3]`)
     for (const part of world.scoreboard.getObjective(moneyObj.id).getParticipants()) {
         if (!part.displayName.startsWith("§ ")) continue
         for (const player of world.getPlayers()) {
